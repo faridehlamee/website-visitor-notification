@@ -3,11 +3,12 @@ FROM n8nio/n8n:latest
 # Set working directory
 WORKDIR /home/node
 
-# Expose port (Railway will provide PORT env var)
-EXPOSE $PORT
+# Expose port (Railway will map this automatically)
+EXPOSE 5678
 
-# Set environment variables (Railway will override these)
-ENV N8N_PORT=$PORT
+# Set environment variables
+# Note: Railway will set PORT env var automatically
+# We'll configure N8N_PORT via environment variables in Railway dashboard
 ENV N8N_PROTOCOL=https
 ENV GENERIC_TIMEZONE=UTC
 ENV N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true

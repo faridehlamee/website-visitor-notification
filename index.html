@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to My Website</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+        
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .loading {
+            display: none;
+            color: #667eea;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to My Website</h1>
+        <p>Thank you for visiting! This page will automatically notify the site owner about your visit.</p>
+        <div class="loading" id="loading">Sending notification...</div>
+    </div>
+
+    <script>
+        // Function to get visitor's IP address and send notification
+        async function sendVisitorNotification() {
+            try {
+                // Get IP address using a free service
+                const ipResponse = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipResponse.json();
+                const ipAddress = ipData.ip;
+
+                // Prepare visitor data
+                const visitorData = {
+                    ip: ipAddress,
+                    ipAddress: ipAddress,
+                    userAgent: navigator.userAgent,
+                    referrer: document.referrer || 'Direct',
+                    timestamp: new Date().toISOString(),
+                    pageUrl: window.location.href,
+                    language: navigator.language,
+                    screenResolution: `${window.screen.width}x${window.screen.height}`,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                };
+
+                // Replace 'YOUR_N8N_WEBHOOK_URL' with your actual n8n webhook URL
+                const webhookUrl = 'http://localhost:5678/webhook/visitor-notification'; // e.g., 'https://your-n8n-instance.com/webhook/visitor-notification'
+
+                // Show loading message
+                document.getElementById('loading').style.display = 'block';
+
+                // Send data to n8n webhook
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(visitorData)
+                });
+
+                const result = await response.json();
+                
+                // Hide loading message
+                document.getElementById('loading').style.display = 'none';
+                
+                console.log('Notification sent successfully:', result);
+            } catch (error) {
+                console.error('Error sending notification:', error);
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // Send notification when page loads
+        window.addEventListener('load', () => {
+            sendVisitorNotification();
+        });
+    </script>
+</body>
+</html>
+

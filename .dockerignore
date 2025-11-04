@@ -1,0 +1,11 @@
+README.md
+ACCOUNTS_NEEDED.md
+DOCKER_SETUP.md
+TROUBLESHOOTING.md
+docker-compose.yml
+Dockerfile
+.dockerignore
+.git
+.gitignore
+*.md
+

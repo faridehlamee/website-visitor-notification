@@ -1,0 +1,261 @@
+{
+  "name": "Visitor Notification Service",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "visitor-notification",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-node",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "webhookId": "visitor-notification-webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ip-address",
+              "name": "ipAddress",
+              "value": "={{ $json.body.ip || $json.body.ipAddress || $json.query.ip }}",
+              "type": "string"
+            },
+            {
+              "id": "user-agent",
+              "name": "userAgent",
+              "value": "={{ $json.body.userAgent || $json.headers['user-agent'] }}",
+              "type": "string"
+            },
+            {
+              "id": "timestamp",
+              "name": "timestamp",
+              "value": "={{ $now }}",
+              "type": "string"
+            },
+            {
+              "id": "referrer",
+              "name": "referrer",
+              "value": "={{ $json.body.referrer || $json.headers.referer || 'Direct' }}",
+              "type": "string"
+            },
+            {
+              "id": "language",
+              "name": "language",
+              "value": "={{ $json.body.language || 'Unknown' }}",
+              "type": "string"
+            },
+            {
+              "id": "screenResolution",
+              "name": "screenResolution",
+              "value": "={{ $json.body.screenResolution || 'Unknown' }}",
+              "type": "string"
+            },
+            {
+              "id": "timezone",
+              "name": "timezone",
+              "value": "={{ $json.body.timezone || 'Unknown' }}",
+              "type": "string"
+            },
+            {
+              "id": "pageUrl",
+              "name": "pageUrl",
+              "value": "={{ $json.body.pageUrl || 'Unknown' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-node",
+      "name": "Set Visitor Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=http://ip-api.com/json/{{ $json.ipAddress }}?fields=status,message,country,regionName,city,lat,lon,isp,query",
+        "authentication": "none",
+        "options": {}
+      },
+      "id": "http-request-node",
+      "name": "Get Location from IP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "location",
+              "name": "location",
+              "value": "={{ $json.city + ', ' + $json.regionName + ', ' + $json.country }}",
+              "type": "string"
+            },
+            {
+              "id": "coordinates",
+              "name": "coordinates",
+              "value": "={{ $json.lat }}, {{ $json.lon }}",
+              "type": "string"
+            },
+            {
+              "id": "isp",
+              "name": "isp",
+              "value": "={{ $json.isp }}",
+              "type": "string"
+            },
+            {
+              "id": "country",
+              "name": "country",
+              "value": "={{ $json.country }}",
+              "type": "string"
+            },
+            {
+              "id": "city",
+              "name": "city",
+              "value": "={{ $json.city }}",
+              "type": "string"
+            },
+            {
+              "id": "regionName",
+              "name": "regionName",
+              "value": "={{ $json.regionName }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-location-node",
+      "name": "Set Location Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        850,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@example.com",
+        "toEmail": "your-email@example.com",
+        "subject": "New Visitor on Your Website",
+        "emailType": "html",
+        "message": "<!DOCTYPE html>\n<html>\n<head>\n    <style>\n        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }\n        .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }\n        .header { background-color: #4CAF50; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }\n        .header h2 { margin: 0; font-size: 24px; }\n        .content { background-color: white; padding: 25px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }\n        .info-row { margin: 15px 0; padding: 12px; background-color: #f9f9f9; border-left: 4px solid #4CAF50; border-radius: 3px; }\n        .label { font-weight: bold; color: #555; display: block; margin-bottom: 5px; }\n        .value { color: #333; word-break: break-word; }\n        .section-title { font-size: 18px; color: #4CAF50; margin: 20px 0 10px 0; padding-bottom: 5px; border-bottom: 2px solid #4CAF50; }\n        .footer { text-align: center; color: #777; font-size: 12px; margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd; }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"header\">\n            <h2>🔔 New Website Visitor</h2>\n        </div>\n        <div class=\"content\">\n            <p style=\"margin-bottom: 20px;\">A new visitor has accessed your website!</p>\n            \n            <div class=\"section-title\">📍 Location Information</div>\n            <div class=\"info-row\">\n                <span class=\"label\">IP Address:</span>\n                <span class=\"value\">{{ $json.ipAddress }}</span>\n            </div>\n            <div class=\"info-row\">\n                <span class=\"label\">Country:</span>\n                <span class=\"value\">{{ $json.country }}</span>\n            </div>\n            <div class=\"info-row\">\n                <span class=\"label\">City:</span>\n                <span class=\"value\">{{ $json.city }}</span>\n            </div>\n            <div class=\"info-row\">\n                <span class=\"label\">Region:</span>\n                <span class=\"value\">{{ $json.regionName }}</span>\n            </div>\n            <div class=\"info-row\">\n                <span class=\"label\">Full Location:</span>\n                <span class=\"value\">{{ $json.location }}</span>\n            </div>\n            <div class=\"info-row\">\n                <span class=\"label\">Coordinates:</span>\n                <span class=\"value\">{{ $json.coordinates }}</span>\n            </div>\n            <div class=\"info-row\">\n                <span class=\"label\">ISP:</span>\n                <span class=\"value\">{{ $json.isp }}</span>\n            </div>\n            \n            <div class=\"section-title\">🌐 Browser & Device Information</div>\n            <div class=\"info-row\">\n                <span class=\"label\">Language:</span>\n                <span class=\"value\">{{ $json.language }}</span>\n            </div>\n            <div class=\"info-row\">\n                <span class=\"label\">Screen Resolution:</span>\n                <span class=\"value\">{{ $json.screenResolution }}</span>\n            </div>\n            <div class=\"info-row\">\n                <span class=\"label\">Timezone:</span>\n                <span class=\"value\">{{ $json.timezone }}</span>\n            </div>\n            <div class=\"info-row\">\n                <span class=\"label\">User Agent:</span>\n                <span class=\"value\">{{ $json.userAgent }}</span>\n            </div>\n            \n            <div class=\"section-title\">🔗 Visit Information</div>\n            <div class=\"info-row\">\n                <span class=\"label\">Page URL:</span>\n                <span class=\"value\">{{ $json.pageUrl }}</span>\n            </div>\n            <div class=\"info-row\">\n                <span class=\"label\">Referrer:</span>\n                <span class=\"value\">{{ $json.referrer }}</span>\n            </div>\n            <div class=\"info-row\">\n                <span class=\"label\">Timestamp:</span>\n                <span class=\"value\">{{ $json.timestamp }}</span>\n            </div>\n            \n            <div class=\"footer\">\n                <p>This notification was automatically generated by your Visitor Notification Service.</p>\n            </div>\n        </div>\n    </div>\n</body>\n</html>",
+        "options": {}
+      },
+      "id": "email-node",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1050,
+        300
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-credentials",
+          "name": "SMTP Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"message\": \"Notification sent\" } }}",
+        "options": {}
+      },
+      "id": "respond-node",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1250,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Visitor Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Visitor Data": {
+      "main": [
+        [
+          {
+            "node": "Get Location from IP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Location from IP": {
+      "main": [
+        [
+          {
+            "node": "Set Location Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Location Data": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

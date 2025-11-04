@@ -10,6 +10,7 @@ EXPOSE 5678
 # Note: Railway will set PORT env var automatically
 # We'll configure N8N_PORT via environment variables in Railway dashboard
 ENV N8N_PROTOCOL=https
+ENV N8N_TRUST_PROXY=true
 ENV GENERIC_TIMEZONE=UTC
 ENV N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
 ENV DB_SQLITE_POOL_SIZE=10

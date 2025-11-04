@@ -79,10 +79,10 @@
                     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
                 };
 
-                // Replace with your n8n Cloud webhook URL for production
+                // Replace with your Railway n8n webhook URL
                 // For local testing: 'http://localhost:5678/webhook/visitor-notification'
-                // For production: 'https://your-workspace.n8n.cloud/webhook/visitor-notification'
-                const webhookUrl = 'https://your-workspace.n8n.cloud/webhook/visitor-notification'; // UPDATE THIS with your n8n Cloud webhook URL
+                // For Railway production: 'https://your-app-name.up.railway.app/webhook/visitor-notification'
+                const webhookUrl = 'website-visitor-notification-production.up.railway.app'; // UPDATE THIS with your Railway webhook URL from n8n
 
                 // Show loading message
                 document.getElementById('loading').style.display = 'block';

@@ -79,8 +79,10 @@
                     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
                 };
 
-                // Replace 'YOUR_N8N_WEBHOOK_URL' with your actual n8n webhook URL
-                const webhookUrl = 'http://localhost:5678/webhook/visitor-notification'; // e.g., 'https://your-n8n-instance.com/webhook/visitor-notification'
+                // Replace with your n8n Cloud webhook URL for production
+                // For local testing: 'http://localhost:5678/webhook/visitor-notification'
+                // For production: 'https://your-workspace.n8n.cloud/webhook/visitor-notification'
+                const webhookUrl = 'https://your-workspace.n8n.cloud/webhook/visitor-notification'; // UPDATE THIS with your n8n Cloud webhook URL
 
                 // Show loading message
                 document.getElementById('loading').style.display = 'block';

@@ -48,3 +48,8 @@ credentials/
 *.pem
 *.cert
 
+# Android/Gradle files (if accidentally included)
+.gradle/
+*.gradle
+.android/
+
